@@ -34,7 +34,7 @@ export function EdgeRibbon({
                 styles.container,
                 {
                     backgroundColor: primaryColor,
-                    top,
+                    top: top as any, // React Native accepts number | string for top
                     [isRight ? 'right' : 'left']: 0,
                     transform: [
                         { translateY: -50 },

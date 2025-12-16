@@ -3,7 +3,7 @@
  */
 
 import React, { useEffect, useRef } from 'react';
-import { View, Animated, StyleSheet } from 'react-native';
+import { View, Text, Animated, StyleSheet } from 'react-native';
 import type { MsgMorphTheme } from '../theme';
 
 interface TypingIndicatorProps {
@@ -68,7 +68,7 @@ export function TypingIndicator({ theme }: TypingIndicatorProps) {
         <View style={styles.container}>
             {/* Avatar */}
             <View style={[styles.avatar, { backgroundColor: theme.primaryColor }]}>
-                <View style={{ fontSize: 12 }}>🎧</View>
+                <Text style={{ fontSize: 12, color: '#FFF' }}>🎧</Text>
             </View>
 
             {/* Dots */}
