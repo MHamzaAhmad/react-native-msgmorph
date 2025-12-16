@@ -2,11 +2,12 @@
  * MsgMorph React Native SDK - Home Screen
  */
 
-import React from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Image, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, ScrollView, Image, StyleSheet, ActivityIndicator } from 'react-native';
 import type { WidgetConfig, FeedbackType } from '../../core/types';
 import type { MsgMorphTheme, MsgMorphStyles } from '../theme';
 import { FeedbackTypeMeta } from '../../core/constants';
+import { useMsgMorph } from '../../context/MsgMorphContext';
 
 interface HomeScreenProps {
     config: WidgetConfig;
@@ -15,6 +16,7 @@ interface HomeScreenProps {
     onClose: () => void;
     onSelectFeedbackType: (type: FeedbackType) => void;
     onStartLiveChat: () => void;
+    onShowOffline: () => void;
 }
 
 export function HomeScreen({
@@ -24,11 +26,53 @@ export function HomeScreen({
     onClose,
     onSelectFeedbackType,
     onStartLiveChat,
+    onShowOffline,
 }: HomeScreenProps) {
+    const { apiClient } = useMsgMorph();
+    const [isAgentsAvailable, setIsAgentsAvailable] = useState<boolean | null>(null);
+    const [isCheckingAvailability, setIsCheckingAvailability] = useState(true);
+
     const feedbackItems = config.items.filter(
         (item) => item.isEnabled && ['ISSUE', 'FEATURE_REQUEST', 'FEEDBACK', 'OTHER'].includes(item.type)
     );
     const hasLiveChat = config.items.some((item) => item.type === 'LIVE_CHAT' && item.isEnabled);
+
+    // Check availability on mount
+    useEffect(() => {
+        if (!hasLiveChat || !apiClient) {
+            setIsCheckingAvailability(false);
+            setIsAgentsAvailable(false);
+            return;
+        }
+
+        const checkAvailability = async () => {
+            try {
+                const result = await apiClient.checkAvailability(config.projectId);
+                setIsAgentsAvailable(result);
+            } catch {
+                setIsAgentsAvailable(false);
+            } finally {
+                setIsCheckingAvailability(false);
+            }
+        };
+
+        checkAvailability();
+    }, [hasLiveChat, apiClient, config.projectId]);
+
+    const handleLiveChatPress = () => {
+        if (isAgentsAvailable) {
+            onStartLiveChat();
+        } else {
+            onShowOffline();
+        }
+    };
+
+    // Determine live chat subtitle
+    const getLiveChatSubtitle = () => {
+        if (isCheckingAvailability) return 'Checking availability...';
+        if (isAgentsAvailable) return 'We typically reply in minutes';
+        return "We're currently offline";
+    };
 
     return (
         <View style={styles.container}>
@@ -84,14 +128,28 @@ export function HomeScreen({
                 {hasLiveChat && (
                     <TouchableOpacity
                         style={[localStyles.liveChatButton, { backgroundColor: theme.textColor }]}
-                        onPress={onStartLiveChat}
+                        onPress={handleLiveChatPress}
                     >
                         <View style={localStyles.liveChatIcon}>
-                            <Text style={{ fontSize: 20 }}>💬</Text>
+                            {isCheckingAvailability ? (
+                                <ActivityIndicator size="small" color="#FFFFFF" />
+                            ) : (
+                                <Text style={{ fontSize: 20 }}>💬</Text>
+                            )}
                         </View>
                         <View style={localStyles.liveChatText}>
                             <Text style={localStyles.liveChatTitle}>Chat with us</Text>
-                            <Text style={localStyles.liveChatSubtitle}>We typically reply in minutes</Text>
+                            <View style={localStyles.subtitleRow}>
+                                {!isCheckingAvailability && isAgentsAvailable !== null && (
+                                    <View
+                                        style={[
+                                            localStyles.statusDot,
+                                            { backgroundColor: isAgentsAvailable ? '#34C759' : '#FF9500' },
+                                        ]}
+                                    />
+                                )}
+                                <Text style={localStyles.liveChatSubtitle}>{getLiveChatSubtitle()}</Text>
+                            </View>
                         </View>
                         <Text style={localStyles.liveChatArrow}>›</Text>
                     </TouchableOpacity>
@@ -164,4 +222,16 @@ const localStyles = StyleSheet.create({
         fontSize: 24,
         color: 'rgba(255,255,255,0.5)',
     },
+    subtitleRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 2,
+    },
+    statusDot: {
+        width: 6,
+        height: 6,
+        borderRadius: 3,
+        marginRight: 4,
+    },
 });
+

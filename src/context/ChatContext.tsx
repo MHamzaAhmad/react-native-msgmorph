@@ -80,7 +80,10 @@ export function ChatProvider({ children, projectId, apiBaseUrl }: ChatProviderPr
         if (!socketService.current) return;
 
         socketService.current.onMessage((message) => {
-            // Avoid duplicates
+            // Ignore messages from self (already handled via optimistic update + API response)
+            if (message.senderId === visitorIdRef.current) return;
+
+            // Avoid duplicates by ID
             setMessages((prev) => {
                 if (prev.some((m) => m.id === message.id)) return prev;
                 return [...prev, message];

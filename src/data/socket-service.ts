@@ -49,7 +49,12 @@ export class SocketService {
             this.notifyConnectionChange(false);
 
             try {
-                this.socket = io(this.serverUrl, {
+                // Construct the chat namespace URL
+                const chatUrl = this.serverUrl.endsWith('/')
+                    ? `${this.serverUrl}chat`
+                    : `${this.serverUrl}/chat`;
+
+                this.socket = io(chatUrl, {
                     transports: ['websocket'],
                     query: {
                         clientId: this.visitorId,

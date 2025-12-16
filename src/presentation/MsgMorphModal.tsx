@@ -12,6 +12,7 @@ import { SuccessScreen } from './screens/SuccessScreen';
 import { ChatScreen } from './screens/ChatScreen';
 import { PreChatFormScreen } from './screens/PreChatFormScreen';
 import { ChatRatingScreen } from './screens/ChatRatingScreen';
+import { OfflineScreen } from './screens/OfflineScreen';
 
 export interface MsgMorphModalProps {
     visible: boolean;
@@ -48,6 +49,10 @@ export function MsgMorphModal({
         }
     };
 
+    const handleShowOffline = () => {
+        setCurrentScreen('offline');
+    };
+
     const handlePreChatSubmit = (name: string, email: string) => {
         setPreChatData({ name, email });
         setCurrentScreen('liveChat');
@@ -67,6 +72,7 @@ export function MsgMorphModal({
             case 'compose':
             case 'success':
             case 'preChatForm':
+            case 'offline':
                 setFeedbackType(undefined);
                 setCurrentScreen('home');
                 break;
@@ -109,6 +115,7 @@ export function MsgMorphModal({
                         onClose={onClose}
                         onSelectFeedbackType={handleSelectFeedbackType}
                         onStartLiveChat={handleStartLiveChat}
+                        onShowOffline={handleShowOffline}
                     />
                 );
             case 'compose':
@@ -166,6 +173,17 @@ export function MsgMorphModal({
                             setCurrentScreen('home');
                             onClose();
                         }}
+                    />
+                );
+            case 'offline':
+                return (
+                    <OfflineScreen
+                        config={config}
+                        theme={theme}
+                        styles={styles}
+                        onBack={handleBack}
+                        onClose={onClose}
+                        hasOtherOptions={config.items.some(i => i.isEnabled && i.type !== 'LIVE_CHAT')}
                     />
                 );
             default:

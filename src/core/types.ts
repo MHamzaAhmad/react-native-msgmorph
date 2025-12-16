@@ -146,7 +146,7 @@ export interface MsgMorphConfig {
 }
 
 /** Widget screen states */
-export type WidgetScreen = 'home' | 'compose' | 'success' | 'liveChat' | 'preChatForm' | 'chatRating';
+export type WidgetScreen = 'home' | 'compose' | 'success' | 'liveChat' | 'preChatForm' | 'chatRating' | 'offline';
 
 /** Feedback type alias */
 export type FeedbackType = 'ISSUE' | 'FEATURE_REQUEST' | 'FEEDBACK' | 'OTHER';
