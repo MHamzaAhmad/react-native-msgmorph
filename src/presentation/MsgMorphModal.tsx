@@ -3,7 +3,8 @@
  */
 
 import React, { useState, useMemo } from 'react';
-import { Modal, View, StyleSheet, SafeAreaView, KeyboardAvoidingView, Platform } from 'react-native';
+import { Modal, View, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import type { WidgetConfig, WidgetScreen, FeedbackType } from '../core/types';
 import { createTheme, createStyles } from './theme';
 import { HomeScreen } from './screens/HomeScreen';
@@ -198,16 +199,18 @@ export function MsgMorphModal({
             presentationStyle="pageSheet"
             onRequestClose={onClose}
         >
-            <SafeAreaView style={modalStyles.container}>
-                <KeyboardAvoidingView
-                    style={modalStyles.flex1}
-                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                >
-                    <View style={[modalStyles.flex1, { backgroundColor: theme.backgroundColor }]}>
-                        {renderScreen()}
-                    </View>
-                </KeyboardAvoidingView>
-            </SafeAreaView>
+            <SafeAreaProvider>
+                <SafeAreaView style={modalStyles.container} edges={['top', 'bottom']}>
+                    <KeyboardAvoidingView
+                        style={modalStyles.flex1}
+                        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                    >
+                        <View style={[modalStyles.flex1, { backgroundColor: theme.backgroundColor }]}>
+                            {renderScreen()}
+                        </View>
+                    </KeyboardAvoidingView>
+                </SafeAreaView>
+            </SafeAreaProvider>
         </Modal>
     );
 }

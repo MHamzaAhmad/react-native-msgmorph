@@ -62,8 +62,10 @@ export class ApiClient {
 
     async submitFeedback(publicId: string, data: FeedbackRequest): Promise<FeedbackResponse> {
         // Clean up data: remove empty strings for email/name to avoid validation errors
+        // Convert type to lowercase to match API schema
         const cleanedData = {
             ...data,
+            type: data.type.toLowerCase(),
             email: data.email?.trim() || undefined,
             name: data.name?.trim() || undefined,
         };
