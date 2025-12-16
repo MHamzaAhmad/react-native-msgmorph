@@ -25,7 +25,7 @@ export function EdgeRibbon({
 }: EdgeRibbonProps) {
     const { show, config } = useMsgMorph();
 
-    const primaryColor = backgroundColor || config?.branding?.primaryColor || '#007AFF';
+    const primaryColor = backgroundColor || config?.branding?.primaryColor || '#000000';
     const isRight = position === 'right';
 
     return (

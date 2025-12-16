@@ -31,7 +31,7 @@ export function FloatingLauncher({
 }: FloatingLauncherProps) {
     const { show, config } = useMsgMorph();
 
-    const primaryColor = backgroundColor || config?.branding?.primaryColor || '#007AFF';
+    const primaryColor = backgroundColor || config?.branding?.primaryColor || '#000000';
 
     return (
         <TouchableOpacity

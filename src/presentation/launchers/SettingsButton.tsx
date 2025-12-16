@@ -25,7 +25,7 @@ export function SettingsButton({
 }: SettingsButtonProps) {
     const { show, config } = useMsgMorph();
 
-    const primaryColor = config?.branding?.primaryColor || '#007AFF';
+    const primaryColor = config?.branding?.primaryColor || '#000000';
 
     return (
         <TouchableOpacity style={[styles.container, style]} onPress={show}>

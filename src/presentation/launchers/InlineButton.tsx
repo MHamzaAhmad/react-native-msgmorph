@@ -26,7 +26,7 @@ export function InlineButton({
 }: InlineButtonProps) {
     const { show, showFeedback, config } = useMsgMorph();
 
-    const primaryColor = color || config?.branding?.primaryColor || '#007AFF';
+    const primaryColor = color || config?.branding?.primaryColor || '#000000';
 
     const handlePress = () => {
         if (feedbackType) {

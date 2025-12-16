@@ -15,14 +15,14 @@ export interface MsgMorphTheme {
 }
 
 export function createTheme(branding?: WidgetBranding): MsgMorphTheme {
-    const primaryColor = branding?.primaryColor || '#007AFF';
+    const primaryColor = branding?.primaryColor || '#000000';
 
     return {
         primaryColor,
         textColor: '#1C1C1E',
         secondaryTextColor: '#8E8E93',
         backgroundColor: '#FFFFFF',
-        surfaceColor: '#F2F2F7',
+        surfaceColor: '#F5F5F5',
         borderColor: '#E5E5EA',
     };
 }
