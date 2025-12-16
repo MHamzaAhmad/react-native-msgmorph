@@ -61,11 +61,19 @@ export class ApiClient {
     }
 
     async submitFeedback(publicId: string, data: FeedbackRequest): Promise<FeedbackResponse> {
+        // Clean up data: remove empty strings for email/name to avoid validation errors
+        const cleanedData = {
+            ...data,
+            email: data.email?.trim() || undefined,
+            name: data.name?.trim() || undefined,
+        };
+
         return this.request<FeedbackResponse>(ApiEndpoints.submitFeedback(publicId), {
             method: 'POST',
-            body: JSON.stringify(data),
+            body: JSON.stringify(cleanedData),
         });
     }
+
 
     // ==================== Chat API ====================
 

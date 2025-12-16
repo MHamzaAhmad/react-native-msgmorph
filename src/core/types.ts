@@ -50,10 +50,10 @@ export interface PreChatForm {
 
 /** Widget configuration */
 export interface WidgetConfig {
-    id: string;
+    id?: string;
     projectId: string;
     publicId: string;
-    isEnabled: boolean;
+    isEnabled?: boolean;
     branding: WidgetBranding;
     items: WidgetItem[];
     collectEmail: CollectionRequirementType;
