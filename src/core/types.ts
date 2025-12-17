@@ -113,6 +113,9 @@ export interface DeviceContext {
     deviceType: string;
     os: string;
     osVersion?: string;
+    deviceModel?: string;
+    deviceBrand?: string;
+    isEmulator?: boolean;
     screenWidth: number;
     screenHeight: number;
     windowWidth?: number;
