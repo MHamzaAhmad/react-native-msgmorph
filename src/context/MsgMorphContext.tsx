@@ -5,7 +5,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef, type ReactNode } from 'react';
 import { ApiClient } from '../data/api-client';
 import { storageService } from '../data/storage-service';
-import type { WidgetConfig, MsgMorphConfig, FeedbackType, WidgetScreen } from '../core/types';
+import type { WidgetConfig, MsgMorphConfig, FeedbackType, WidgetScreen, DeviceContext } from '../core/types';
 import { MsgMorphModal } from '../presentation/MsgMorphModal';
 
 interface MsgMorphContextValue {
@@ -31,6 +31,7 @@ interface MsgMorphContextValue {
         content: string;
         email?: string;
         name?: string;
+        deviceContext?: DeviceContext;
     }) => Promise<boolean>;
 }
 
@@ -135,6 +136,7 @@ export function MsgMorphProvider({
         content: string;
         email?: string;
         name?: string;
+        deviceContext?: DeviceContext;
     }) => {
         if (!apiClient.current) return false;
 
@@ -144,6 +146,7 @@ export function MsgMorphProvider({
                 content: params.content,
                 email: params.email,
                 name: params.name,
+                deviceContext: params.deviceContext,
             });
             return true;
         } catch {

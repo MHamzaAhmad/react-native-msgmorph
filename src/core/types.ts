@@ -107,14 +107,31 @@ export interface ChatMessage {
     createdAt: string;
 }
 
-/** Device context for feedback */
+/** Device context for feedback/chat - matches API deviceContextSchema */
 export interface DeviceContext {
-    screenWidth?: number;
-    screenHeight?: number;
-    platform?: string;
-    language?: string;
-    timezone?: string;
+    platform: string;
+    deviceType: string;
+    os: string;
+    osVersion?: string;
+    screenWidth: number;
+    screenHeight: number;
+    windowWidth?: number;
+    windowHeight?: number;
+    pixelRatio?: number;
+    orientation?: string;
+    browser?: string;
+    browserVersion?: string;
+    userAgent?: string;
     appVersion?: string;
+    appBuildNumber?: string;
+    timezone: string;
+    language: string;
+    locale?: string;
+    connectionType?: string;
+    pageUrl?: string;
+    pageTitle?: string;
+    referrer?: string;
+    [key: string]: unknown; // Allow additional properties for Record compatibility
 }
 
 /** Feedback submission request */

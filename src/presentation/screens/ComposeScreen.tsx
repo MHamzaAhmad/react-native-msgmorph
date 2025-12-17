@@ -11,13 +11,12 @@ import {
     ScrollView,
     StyleSheet,
     ActivityIndicator,
-    Platform,
-    Dimensions,
 } from 'react-native';
-import type { WidgetConfig, FeedbackType, DeviceContext } from '../../core/types';
+import type { WidgetConfig, FeedbackType } from '../../core/types';
 import type { MsgMorphTheme, MsgMorphStyles } from '../theme';
 import { FeedbackTypeMeta, CollectionRequirement } from '../../core/constants';
 import { useMsgMorph } from '../../context/MsgMorphContext';
+import { collectDeviceContext } from '../../core/context-collector';
 
 interface ComposeScreenProps {
     config: WidgetConfig;
@@ -72,18 +71,15 @@ export function ComposeScreen({
         setError(null);
 
         try {
-            const { width, height } = Dimensions.get('window');
-            const deviceContext: DeviceContext = {
-                screenWidth: width,
-                screenHeight: height,
-                platform: Platform.OS,
-            };
+            // Collect comprehensive device context
+            const deviceContext = collectDeviceContext();
 
             const success = await submitFeedback({
                 type: feedbackType,
                 content: message.trim(),
                 email: email.trim() || undefined,
                 name: name.trim() || undefined,
+                deviceContext,
             });
 
             if (success) {
