@@ -56,11 +56,11 @@ export class ApiClient {
 
     // ==================== Widget API ====================
 
-    async getWidgetConfig(publicId: string): Promise<WidgetConfig> {
-        return this.request<WidgetConfig>(ApiEndpoints.widgetConfig(publicId));
+    async getWidgetConfig(widgetId: string): Promise<WidgetConfig> {
+        return this.request<WidgetConfig>(ApiEndpoints.widgetConfig(widgetId));
     }
 
-    async submitFeedback(publicId: string, data: FeedbackRequest): Promise<FeedbackResponse> {
+    async submitFeedback(widgetId: string, data: FeedbackRequest): Promise<FeedbackResponse> {
         // Clean up data: remove empty strings for email/name to avoid validation errors
         // Convert type to lowercase to match API schema
         const cleanedData = {
@@ -70,7 +70,7 @@ export class ApiClient {
             name: data.name?.trim() || undefined,
         };
 
-        return this.request<FeedbackResponse>(ApiEndpoints.submitFeedback(publicId), {
+        return this.request<FeedbackResponse>(ApiEndpoints.submitFeedback(widgetId), {
             method: 'POST',
             body: JSON.stringify(cleanedData),
         });
@@ -80,7 +80,7 @@ export class ApiClient {
     // ==================== Chat API ====================
 
     async startChat(params: {
-        projectId: string;
+        widgetId: string;
         visitorId: string;
         visitorName?: string;
         visitorEmail?: string;
@@ -88,17 +88,18 @@ export class ApiClient {
         subject?: string;
         metadata?: Record<string, unknown>;
     }): Promise<StartChatResult> {
-        return this.request<StartChatResult>(ApiEndpoints.startChat, {
+        const { widgetId, ...body } = params;
+        return this.request<StartChatResult>(ApiEndpoints.startChat(widgetId), {
             method: 'POST',
-            body: JSON.stringify(params),
+            body: JSON.stringify(body),
         });
     }
 
-    async recoverSession(visitorId: string, projectId: string): Promise<StartChatResult | null> {
+    async recoverSession(widgetId: string, visitorId: string): Promise<StartChatResult | null> {
         try {
-            const params = new URLSearchParams({ visitorId, projectId });
+            const params = new URLSearchParams({ visitorId });
             const result = await this.request<StartChatResult>(
-                `${ApiEndpoints.activeSession}?${params}`
+                `${ApiEndpoints.activeSession(widgetId)}?${params}`
             );
             return result.session ? result : null;
         } catch {
@@ -106,38 +107,45 @@ export class ApiClient {
         }
     }
 
-    async getMessages(sessionId: string): Promise<ChatMessage[]> {
+    async getMessages(widgetId: string, sessionId: string): Promise<ChatMessage[]> {
         const result = await this.request<{ messages: ChatMessage[] }>(
-            ApiEndpoints.sessionMessages(sessionId)
+            ApiEndpoints.sessionMessages(widgetId, sessionId)
         );
         return result.messages || [];
     }
 
     async sendMessage(
+        widgetId: string,
         sessionId: string,
         content: string,
         visitorId: string,
         visitorName?: string
     ): Promise<ChatMessage> {
-        return this.request<ChatMessage>(ApiEndpoints.sendVisitorMessage(sessionId), {
+        return this.request<ChatMessage>(ApiEndpoints.sessionMessages(widgetId, sessionId), {
             method: 'POST',
             headers: this.getHeaders(visitorId, visitorName),
             body: JSON.stringify({ content }),
         });
     }
 
-    async rateChat(sessionId: string, rating: number, feedback?: string): Promise<void> {
-        await this.request<void>(ApiEndpoints.rateSession(sessionId), {
+    async rateChat(widgetId: string, sessionId: string, rating: number, feedback?: string): Promise<void> {
+        await this.request<void>(ApiEndpoints.rateSession(widgetId, sessionId), {
             method: 'POST',
             body: JSON.stringify({ rating, feedback }),
         });
     }
 
-    async checkAvailability(projectId: string): Promise<boolean> {
+    async requestHandoff(widgetId: string, sessionId: string, visitorId: string): Promise<void> {
+        await this.request<void>(ApiEndpoints.requestHandoff(widgetId, sessionId), {
+            method: 'POST',
+            headers: this.getHeaders(visitorId),
+        });
+    }
+
+    async checkAvailability(widgetId: string): Promise<boolean> {
         try {
-            const params = new URLSearchParams({ projectId });
             const result = await this.request<{ isAvailable: boolean }>(
-                `${ApiEndpoints.checkAvailability}?${params}`
+                ApiEndpoints.checkAvailability(widgetId)
             );
             return result.isAvailable ?? false;
         } catch {
@@ -145,3 +153,4 @@ export class ApiClient {
         }
     }
 }
+

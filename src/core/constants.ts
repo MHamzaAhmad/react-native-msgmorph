@@ -6,14 +6,17 @@
 export const ApiEndpoints = {
     BASE_PATH: '/api/v1',
 
-    widgetConfig: (publicId: string) => `/api/v1/widget/config/${publicId}`,
-    submitFeedback: (publicId: string) => `/api/v1/widget/feedback/${publicId}`,
-    startChat: '/api/v1/chat/sessions/start',
-    activeSession: '/api/v1/chat/sessions/active',
-    sessionMessages: (sessionId: string) => `/api/v1/chat/sessions/${sessionId}/messages`,
-    sendVisitorMessage: (sessionId: string) => `/api/v1/chat/sessions/${sessionId}/messages/visitor`,
-    rateSession: (sessionId: string) => `/api/v1/chat/sessions/${sessionId}/rate`,
-    checkAvailability: '/api/v1/chat/availability',
+    // Widget endpoints - all use widgetId (publicId) as identifier
+    widgetConfig: (widgetId: string) => `/api/v1/widget/${widgetId}/config`,
+    submitFeedback: (widgetId: string) => `/api/v1/widget/${widgetId}/feedback`,
+
+    // Chat endpoints - now under widget namespace
+    checkAvailability: (widgetId: string) => `/api/v1/widget/${widgetId}/chat/availability`,
+    activeSession: (widgetId: string) => `/api/v1/widget/${widgetId}/chat/sessions/active`,
+    startChat: (widgetId: string) => `/api/v1/widget/${widgetId}/chat/sessions`,
+    sessionMessages: (widgetId: string, sessionId: string) => `/api/v1/widget/${widgetId}/chat/sessions/${sessionId}/messages`,
+    rateSession: (widgetId: string, sessionId: string) => `/api/v1/widget/${widgetId}/chat/sessions/${sessionId}/rate`,
+    requestHandoff: (widgetId: string, sessionId: string) => `/api/v1/widget/${widgetId}/chat/sessions/${sessionId}/handoff`,
 } as const;
 
 /** Socket.io event names */
