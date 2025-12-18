@@ -49,6 +49,9 @@
     "type": "git",
     "url": "https://github.com/MHamzaAhmad/react-native-msgmorph.git"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsup",
     "clean": "rimraf dist",
