@@ -14,6 +14,8 @@ import { ChatScreen } from './screens/ChatScreen';
 import { PreChatFormScreen } from './screens/PreChatFormScreen';
 import { ChatRatingScreen } from './screens/ChatRatingScreen';
 import { OfflineScreen } from './screens/OfflineScreen';
+import { ChatProvider } from '../context/ChatContext';
+import { useMsgMorph } from '../context/MsgMorphContext';
 
 export interface MsgMorphModalProps {
     visible: boolean;
@@ -36,6 +38,8 @@ export function MsgMorphModal({
 
     const theme = useMemo(() => createTheme(config.branding), [config.branding]);
     const styles = useMemo(() => createStyles(theme), [theme]);
+
+    const { apiClient, widgetId } = useMsgMorph();
 
     const handleSelectFeedbackType = (type: FeedbackType) => {
         setFeedbackType(type);
@@ -206,7 +210,16 @@ export function MsgMorphModal({
                         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                     >
                         <View style={[modalStyles.flex1, { backgroundColor: theme.backgroundColor }]}>
-                            {renderScreen()}
+                            {(currentScreen === 'liveChat' || currentScreen === 'chatRating') && apiClient ? (
+                                <ChatProvider
+                                    widgetId={widgetId}
+                                    apiBaseUrl={(apiClient as any).baseUrl || 'https://api.msgmorph.com'}
+                                >
+                                    {renderScreen()}
+                                </ChatProvider>
+                            ) : (
+                                renderScreen()
+                            )}
                         </View>
                     </KeyboardAvoidingView>
                 </SafeAreaView>

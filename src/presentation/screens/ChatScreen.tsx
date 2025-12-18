@@ -256,18 +256,7 @@ function ChatScreenContent({
 }
 
 export function ChatScreen(props: ChatScreenProps) {
-    const { apiClient } = useMsgMorph();
-
-    if (!apiClient) return null;
-
-    return (
-        <ChatProvider
-            projectId={props.config.projectId}
-            apiBaseUrl={(apiClient as any).baseUrl || 'https://api.msgmorph.com'}
-        >
-            <ChatScreenContent {...props} />
-        </ChatProvider>
-    );
+    return <ChatScreenContent {...props} />;
 }
 
 const localStyles = StyleSheet.create({

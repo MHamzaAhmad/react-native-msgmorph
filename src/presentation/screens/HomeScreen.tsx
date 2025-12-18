@@ -2,7 +2,7 @@
  * MsgMorph React Native SDK - Home Screen
  */
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Image, StyleSheet, ActivityIndicator } from 'react-native';
 import type { WidgetConfig, FeedbackType } from '../../core/types';
 import type { MsgMorphTheme, MsgMorphStyles } from '../theme';
@@ -29,49 +29,20 @@ export function HomeScreen({
     onShowOffline,
 }: HomeScreenProps) {
     const { apiClient } = useMsgMorph();
-    const [isAgentsAvailable, setIsAgentsAvailable] = useState<boolean | null>(null);
-    const [isCheckingAvailability, setIsCheckingAvailability] = useState(true);
 
     const feedbackItems = config.items.filter(
         (item) => item.isEnabled && ['ISSUE', 'FEATURE_REQUEST', 'FEEDBACK', 'OTHER'].includes(item.type)
     );
     const hasLiveChat = config.items.some((item) => item.type === 'LIVE_CHAT' && item.isEnabled);
 
-    // Check availability on mount
-    useEffect(() => {
-        if (!hasLiveChat || !apiClient) {
-            setIsCheckingAvailability(false);
-            setIsAgentsAvailable(false);
-            return;
-        }
-
-        const checkAvailability = async () => {
-            try {
-                const result = await apiClient.checkAvailability(config.projectId);
-                setIsAgentsAvailable(result);
-            } catch {
-                setIsAgentsAvailable(false);
-            } finally {
-                setIsCheckingAvailability(false);
-            }
-        };
-
-        checkAvailability();
-    }, [hasLiveChat, apiClient, config.projectId]);
 
     const handleLiveChatPress = () => {
-        if (isAgentsAvailable) {
-            onStartLiveChat();
-        } else {
-            onShowOffline();
-        }
+        onStartLiveChat();
     };
 
     // Determine live chat subtitle
     const getLiveChatSubtitle = () => {
-        if (isCheckingAvailability) return 'Checking availability...';
-        if (isAgentsAvailable) return 'We typically reply in minutes';
-        return "We're currently offline";
+        return 'Instant AI support • Humans available on request';
     };
 
     return (
@@ -131,23 +102,17 @@ export function HomeScreen({
                         onPress={handleLiveChatPress}
                     >
                         <View style={localStyles.liveChatIcon}>
-                            {isCheckingAvailability ? (
-                                <ActivityIndicator size="small" color="#FFFFFF" />
-                            ) : (
-                                <Text style={{ fontSize: 20 }}>💬</Text>
-                            )}
+                            <Text style={{ fontSize: 20 }}>💬</Text>
                         </View>
                         <View style={localStyles.liveChatText}>
                             <Text style={localStyles.liveChatTitle}>Chat with us</Text>
                             <View style={localStyles.subtitleRow}>
-                                {!isCheckingAvailability && isAgentsAvailable !== null && (
-                                    <View
-                                        style={[
-                                            localStyles.statusDot,
-                                            { backgroundColor: isAgentsAvailable ? '#34C759' : '#FF9500' },
-                                        ]}
-                                    />
-                                )}
+                                <View
+                                    style={[
+                                        localStyles.statusDot,
+                                        { backgroundColor: '#34C759' },
+                                    ]}
+                                />
                                 <Text style={localStyles.liveChatSubtitle}>{getLiveChatSubtitle()}</Text>
                             </View>
                         </View>
