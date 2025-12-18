@@ -44,11 +44,11 @@ const ChatContext = createContext<ChatContextValue | null>(null);
 
 export interface ChatProviderProps {
     children: ReactNode;
-    projectId: string;
+    widgetId: string;
     apiBaseUrl: string;
 }
 
-export function ChatProvider({ children, projectId, apiBaseUrl }: ChatProviderProps) {
+export function ChatProvider({ children, widgetId, apiBaseUrl }: ChatProviderProps) {
     const [session, setSession] = useState<ChatSession | null>(null);
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [isConnecting, setIsConnecting] = useState(false);
@@ -125,12 +125,12 @@ export function ChatProvider({ children, projectId, apiBaseUrl }: ChatProviderPr
             visitorIdRef.current = visitorId;
 
             // Try to recover existing session
-            let result = await apiClient.current.recoverSession(visitorId, projectId);
+            let result = await apiClient.current.recoverSession(widgetId, visitorId);
 
             // Start new session if no active one
             if (!result) {
                 result = await apiClient.current.startChat({
-                    projectId,
+                    widgetId,
                     visitorId,
                     visitorName: params?.visitorName,
                     visitorEmail: params?.visitorEmail,
@@ -146,7 +146,7 @@ export function ChatProvider({ children, projectId, apiBaseUrl }: ChatProviderPr
             await storageService.setActiveSessionId(result.session.id);
 
             // Load existing messages
-            const existingMessages = await apiClient.current.getMessages(result.session.id);
+            const existingMessages = await apiClient.current.getMessages(widgetId, result.session.id);
             setMessages(existingMessages);
 
             // Connect to socket
@@ -165,7 +165,7 @@ export function ChatProvider({ children, projectId, apiBaseUrl }: ChatProviderPr
             setIsConnecting(false);
             return false;
         }
-    }, [projectId, apiBaseUrl, setupSocketListeners]);
+    }, [widgetId, apiBaseUrl, setupSocketListeners]);
 
     const sendMessage = useCallback(async (content: string) => {
         if (!session || !visitorIdRef.current) return false;
@@ -187,6 +187,7 @@ export function ChatProvider({ children, projectId, apiBaseUrl }: ChatProviderPr
 
         try {
             const sentMessage = await apiClient.current.sendMessage(
+                widgetId,
                 session.id,
                 content,
                 visitorIdRef.current,
@@ -214,12 +215,12 @@ export function ChatProvider({ children, projectId, apiBaseUrl }: ChatProviderPr
         if (!session) return false;
 
         try {
-            await apiClient.current.rateChat(session.id, rating, feedback);
+            await apiClient.current.rateChat(widgetId, session.id, rating, feedback);
             return true;
         } catch {
             return false;
         }
-    }, [session]);
+    }, [widgetId, session]);
 
     const onTyping = useCallback(() => {
         socketService.current?.emitTyping();

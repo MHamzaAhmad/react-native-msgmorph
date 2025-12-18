@@ -5,8 +5,27 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef, type ReactNode } from 'react';
 import { ApiClient } from '../data/api-client';
 import { storageService } from '../data/storage-service';
-import type { WidgetConfig, MsgMorphConfig, FeedbackType, WidgetScreen, DeviceContext } from '../core/types';
+import { ChatClient } from '../core/ChatClient';
+import type {
+    WidgetConfig,
+    FeedbackType,
+    WidgetScreen,
+    DeviceContext,
+    ChatSession,
+    ChatMessage,
+    StartChatResult,
+} from '../core/types';
 import { MsgMorphModal } from '../presentation/MsgMorphModal';
+
+/** Start chat parameters */
+export interface StartChatParams {
+    initialMessage?: string;
+    visitorName?: string;
+    visitorEmail?: string;
+    subject?: string;
+    metadata?: Record<string, unknown>;
+    deviceContext?: DeviceContext;
+}
 
 interface MsgMorphContextValue {
     // State
@@ -20,12 +39,14 @@ interface MsgMorphContextValue {
     widgetId: string;
     visitorId: string | null;
 
-    // Actions
+    // UI Actions
     show: () => void;
     showFeedback: (type?: FeedbackType) => void;
     showLiveChat: () => void;
     hide: () => void;
     loadConfig: () => Promise<WidgetConfig | null>;
+
+    // Feedback API
     submitFeedback: (params: {
         type: FeedbackType;
         content: string;
@@ -33,6 +54,16 @@ interface MsgMorphContextValue {
         name?: string;
         deviceContext?: DeviceContext;
     }) => Promise<boolean>;
+
+    // Chat API (Headless)
+    checkAvailability: () => Promise<boolean>;
+    getActiveSession: () => Promise<ChatSession | null>;
+    startChat: (params?: StartChatParams) => Promise<StartChatResult>;
+    getMessages: (sessionId: string) => Promise<ChatMessage[]>;
+    sendMessage: (sessionId: string, content: string, visitorName?: string) => Promise<ChatMessage>;
+    rateChat: (sessionId: string, rating: number, feedback?: string) => Promise<void>;
+    requestHandoff: (sessionId: string) => Promise<void>;
+    createChatClient: (sessionId: string) => ChatClient;
 }
 
 const MsgMorphContext = createContext<MsgMorphContextValue | null>(null);
@@ -105,6 +136,8 @@ export function MsgMorphProvider({
         }
     }, [widgetId]);
 
+    // ==================== UI Actions ====================
+
     const show = useCallback(() => {
         setInitialScreen('home');
         setInitialFeedbackType(undefined);
@@ -131,6 +164,8 @@ export function MsgMorphProvider({
         setIsModalVisible(false);
     }, []);
 
+    // ==================== Feedback API ====================
+
     const submitFeedback = useCallback(async (params: {
         type: FeedbackType;
         content: string;
@@ -154,6 +189,78 @@ export function MsgMorphProvider({
         }
     }, [widgetId]);
 
+    // ==================== Chat API (Headless) ====================
+
+    const checkAvailability = useCallback(async (): Promise<boolean> => {
+        if (!apiClient.current) return false;
+        return apiClient.current.checkAvailability(widgetId);
+    }, [widgetId]);
+
+    const getActiveSession = useCallback(async (): Promise<ChatSession | null> => {
+        if (!apiClient.current || !visitorId) return null;
+        const result = await apiClient.current.recoverSession(widgetId, visitorId);
+        return result?.session ?? null;
+    }, [widgetId, visitorId]);
+
+    const startChat = useCallback(async (params?: StartChatParams): Promise<StartChatResult> => {
+        if (!apiClient.current) {
+            throw new Error('MsgMorph not initialized');
+        }
+
+        const vid = visitorId || await storageService.getOrCreateVisitorId();
+
+        return apiClient.current.startChat({
+            widgetId,
+            visitorId: vid,
+            visitorName: params?.visitorName,
+            visitorEmail: params?.visitorEmail,
+            initialMessage: params?.initialMessage,
+            subject: params?.subject,
+            metadata: params?.metadata,
+        });
+    }, [widgetId, visitorId]);
+
+    const getMessages = useCallback(async (sessionId: string): Promise<ChatMessage[]> => {
+        if (!apiClient.current) return [];
+        return apiClient.current.getMessages(widgetId, sessionId);
+    }, [widgetId]);
+
+    const sendMessage = useCallback(async (
+        sessionId: string,
+        content: string,
+        visitorName?: string
+    ): Promise<ChatMessage> => {
+        if (!apiClient.current) {
+            throw new Error('MsgMorph not initialized');
+        }
+
+        const vid = visitorId || await storageService.getOrCreateVisitorId();
+
+        return apiClient.current.sendMessage(widgetId, sessionId, content, vid, visitorName);
+    }, [widgetId, visitorId]);
+
+    const rateChat = useCallback(async (
+        sessionId: string,
+        rating: number,
+        feedback?: string
+    ): Promise<void> => {
+        if (!apiClient.current) return;
+        await apiClient.current.rateChat(widgetId, sessionId, rating, feedback);
+    }, [widgetId]);
+
+    const requestHandoff = useCallback(async (sessionId: string): Promise<void> => {
+        if (!apiClient.current) return;
+        const vid = visitorId || await storageService.getOrCreateVisitorId();
+        await apiClient.current.requestHandoff(widgetId, sessionId, vid);
+    }, [widgetId, visitorId]);
+
+    const createChatClient = useCallback((sessionId: string): ChatClient => {
+        const vid = visitorId || 'anonymous';
+        return new ChatClient(apiBaseUrl, sessionId, vid);
+    }, [apiBaseUrl, visitorId]);
+
+    // ==================== Context Value ====================
+
     const value: MsgMorphContextValue = {
         isInitialized,
         config,
@@ -162,12 +269,23 @@ export function MsgMorphProvider({
         apiClient: apiClient.current,
         widgetId,
         visitorId,
+        // UI Actions
         show,
         showFeedback,
         showLiveChat,
         hide,
         loadConfig,
+        // Feedback API
         submitFeedback,
+        // Chat API
+        checkAvailability,
+        getActiveSession,
+        startChat,
+        getMessages,
+        sendMessage,
+        rateChat,
+        requestHandoff,
+        createChatClient,
     };
 
     return (

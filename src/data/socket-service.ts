@@ -57,8 +57,8 @@ export class SocketService {
                 this.socket = io(chatUrl, {
                     transports: ['websocket'],
                     query: {
-                        clientId: this.visitorId,
-                        clientType: 'visitor',
+                        userType: 'visitor',
+                        visitorId: this.visitorId,
                         sessionId: this.sessionId,
                     },
                     reconnection: true,
