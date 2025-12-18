@@ -3,7 +3,7 @@
   "description": "MsgMorph React Native SDK - Native feedback widget and live chat for React Native apps",
   "version": "0.1.0",
   "author": "MsgMorph",
-  "bugs": "https://github.com/msgmorph/msgmorph/issues",
+  "bugs": "https://github.com/MHamzaAhmad/react-native-msgmorph/issues",
   "dependencies": {
     "socket.io-client": "^4.8.1"
   },
@@ -47,8 +47,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/msgmorph/msgmorph.git",
-    "directory": "packages/sdks/msgmorph_rn"
+    "url": "https://github.com/MHamzaAhmad/react-native-msgmorph.git"
   },
   "scripts": {
     "build": "tsup",

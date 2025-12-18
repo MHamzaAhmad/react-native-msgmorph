@@ -1,47 +1,11 @@
 # MsgMorph React Native SDK
 
-Native feedback widget and live chat for React Native apps.
+Official React Native SDK for [MsgMorph](https://msgmorph.com) - Native feedback widget and live chat for React Native apps.
 
-## Installation
+## Quickstart
 
-```bash
-npm install @msgmorph/react-native
-# or
-yarn add @msgmorph/react-native
-# or
-pnpm add @msgmorph/react-native
-```
+For installation instructions and usage guide, please visit our **[Documentation](https://docs.msgmorph.com)**.
 
-## Quick Start
+## Issues
 
-```tsx
-import { MsgMorph, MsgMorphProvider } from '@msgmorph/react-native';
-
-// 1. Wrap your app with the provider
-function App() {
-  return (
-    <MsgMorphProvider
-      widgetId="YOUR_WIDGET_ID"
-      apiBaseUrl="https://api.msgmorph.com"
-    >
-      <YourApp />
-    </MsgMorphProvider>
-  );
-}
-
-// 2. Use launcher components anywhere
-import { FloatingLauncher, SettingsButton } from '@msgmorph/react-native';
-
-// FAB button
-<FloatingLauncher />
-
-// Settings row
-<SettingsButton title="Send Feedback" />
-
-// Or open programmatically
-const { show, showFeedback, showLiveChat } = useMsgMorph();
-```
-
-## Documentation
-
-See the [MsgMorph Documentation](https://docs.msgmorph.com) for full details.
+If you encounter any bugs or have feature requests, please file an issue on our [GitHub Issue Tracker](https://github.com/MHamzaAhmad/react-native-msgmorph/issues).
