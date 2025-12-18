@@ -1,10 +1,19 @@
 {
   "name": "@msgmorph/react-native",
-  "version": "0.1.0",
   "description": "MsgMorph React Native SDK - Native feedback widget and live chat for React Native apps",
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
+  "version": "0.1.0",
+  "author": "MsgMorph",
+  "bugs": "https://github.com/msgmorph/msgmorph/issues",
+  "dependencies": {
+    "socket.io-client": "^4.8.1"
+  },
+  "devDependencies": {
+    "@react-native-async-storage/async-storage": "^2.2.0",
+    "@types/react": "^19.2.7",
+    "rimraf": "^6.1.2",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -17,50 +26,36 @@
     "src",
     "dist"
   ],
-  "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch",
-    "typecheck": "tsc --noEmit",
-    "lint": "biome lint ./src",
-    "clean": "rimraf dist"
-  },
+  "homepage": "https://msgmorph.com",
   "keywords": [
-    "react-native",
-    "msgmorph",
+    "customer-support",
     "feedback",
-    "widget",
     "live-chat",
-    "customer-support"
+    "msgmorph",
+    "react-native",
+    "widget"
   ],
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "peerDependencies": {
+    "@react-native-async-storage/async-storage": "^2.2.0",
+    "react": "19.2.3",
+    "react-native": "^0.83.0",
+    "react-native-device-info": "^15.0.1",
+    "react-native-safe-area-context": "^5.6.2"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/msgmorph/msgmorph.git",
     "directory": "packages/sdks/msgmorph_rn"
   },
-  "author": "MsgMorph",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/msgmorph/msgmorph/issues"
+  "scripts": {
+    "build": "tsup",
+    "clean": "rimraf dist",
+    "dev": "tsup --watch",
+    "lint": "biome lint ./src",
+    "typecheck": "tsc --noEmit"
   },
-  "homepage": "https://msgmorph.com",
-  "peerDependencies": {
-    "react": ">=18.0.0",
-    "react-native": ">=0.70.0",
-    "@react-native-async-storage/async-storage": ">=1.17.0",
-    "react-native-safe-area-context": ">=4.0.0",
-    "react-native-device-info": ">=10.0.0"
-  },
-  "dependencies": {
-    "socket.io-client": "^4.8.1"
-  },
-  "devDependencies": {
-    "@react-native-async-storage/async-storage": "^2.2.0",
-    "@types/react": "~19.2.7",
-    "@types/react-native": "^0.73.0",
-    "react": "19.2.3",
-    "react-native": "^0.83.0",
-    "rimraf": "^6.1.2",
-    "tsup": "^8.5.1",
-    "typescript": "^5.9.3"
-  }
+  "types": "./dist/index.d.ts"
 }
