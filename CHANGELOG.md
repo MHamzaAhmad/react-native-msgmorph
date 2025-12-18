@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
   - Issue reporting, feature requests, general feedback
   - Email/name collection (required, optional, or none)
   - Success confirmation screen
+- **Headless APIs** - Build custom UIs with `useMsgMorph` and `useChat` hooks
 - **Live Chat** - Real-time chat with support agents
   - Agent availability detection with offline screen
   - Typing indicators
